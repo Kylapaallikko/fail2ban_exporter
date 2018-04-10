@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from re import compile, findall
 from subprocess import PIPE, run
 from time import sleep
