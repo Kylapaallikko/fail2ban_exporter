@@ -1,5 +1,5 @@
 # fail2ban_exporter
-Fail2ban exporter for prometheus.io
+Fail2ban exporter for prometheus.io. Python 3 required.
 
 **Enviroment variables**
 
