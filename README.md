@@ -3,4 +3,4 @@ Fail2ban exporter for prometheus.io. Python 3 required.
 
 **Enviroment variables**
 
-LISTEN_ADDRESS, LISTEN_PORT, EXEC_PATH
+LISTEN_ADDRESS (localhost), LISTEN_PORT (9180), EXEC_PATH (/usr/bin/)
