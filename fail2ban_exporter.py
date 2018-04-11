@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from re import compile, findall
-from subprocess import PIPE, run, getoutput
+from subprocess import PIPE, run
 from time import sleep
 from os import getenv
 
