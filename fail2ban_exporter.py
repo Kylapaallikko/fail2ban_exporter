@@ -9,7 +9,7 @@ from prometheus_client.core import REGISTRY, GaugeMetricFamily
 
 
 addr = getenv('LISTEN_ADDRESS', 'localhost')
-port = getenv('LISTEN_PORT', 9180)
+port = int(getenv('LISTEN_PORT', 9180))
 path = getenv('EXEC_PATH', '/usr/bin/')
 cmd = "{path}fail2ban-client status {service}"
 comp = compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
