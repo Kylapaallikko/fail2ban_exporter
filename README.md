@@ -1,8 +1,15 @@
 # fail2ban_exporter
-Fail2ban exporter for prometheus.io. Python 3 required.
+Fail2ban exporter for [prometheus.io](https://prometheus.io).
 
 ![Graph](example.PNG "graph")
 
-**Enviroment variables**
+## Requirements
+- Python 3
 
-LISTEN_ADDRESS (localhost), LISTEN_PORT (9180), EXEC_PATH (/usr/bin/)
+## Installation
+Run `install.sh` and fail2ban_exporter will be installed as a Systemd service.
+
+## Enviroment variables
+- **LISTEN_ADDRESS**. Default: `localhost`
+- **LISTEN_PORT**. Default: `9180`
+- **EXEC_PATH**. Default: `/usr/bin/`
