@@ -35,7 +35,7 @@ class GaugeCollector(object):
         if jail:
             args.append(jail)
         r = run(args, stdout=PIPE, check=True)
-        return findall(comp, ''.join(bytes(r.stdout).decode('utf-8')).lower())
+        return findall(comp, r.stdout.decode('utf-8'))
 
     def snake_case(self, string):
         return string.strip().replace("-", "_").replace(" ", "_")
