@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
+import os
+
 from re import compile, findall
 from subprocess import PIPE, run
 from time import sleep
-from os import getenv
 
 from prometheus_client import Gauge, start_http_server
 from prometheus_client.core import REGISTRY, GaugeMetricFamily
 
 
-addr = getenv('LISTEN_ADDRESS', 'localhost')
-port = int(getenv('LISTEN_PORT', 9180))
-path = getenv('EXEC_PATH', '/usr/bin/')
+addr = os.getenv('LISTEN_ADDRESS', 'localhost')
+port = int(os.getenv('LISTEN_PORT', 9180))
+path = os.getenv('EXEC_PATH', '/usr/bin/')
 cmd = "{path}fail2ban-client status {service}"
 comp = compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
 
