@@ -11,8 +11,7 @@ from prometheus_client.core import REGISTRY, GaugeMetricFamily
 
 addr = os.getenv('LISTEN_ADDRESS', 'localhost')
 port = int(os.getenv('LISTEN_PORT', 9180))
-path = os.getenv('EXEC_PATH', '/usr/bin/')
-cmd = "{path}fail2ban-client status {service}"
+cmd =  os.path.join(os.getenv('EXEC_PATH', '/usr/bin/'), 'fail2ban-client')
 comp = compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
 
 
@@ -31,9 +30,11 @@ class GaugeCollector(object):
     def get_jails(self, jails):
         return jails[1][1].split(",")
 
-    def extract_data(self, jail=""):
-        r = run(cmd.format(path=path, service=jail),
-                stdout=PIPE, check=True, shell=True)
+    def extract_data(self, jail=None):
+        args = [cmd, "status"]
+        if jail:
+            args.append(jail)
+        r = run(args, stdout=PIPE, check=True)
         return findall(comp, ''.join(bytes(r.stdout).decode('utf-8')).lower())
 
     def snake_case(self, string):
