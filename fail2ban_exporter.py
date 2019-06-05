@@ -20,6 +20,7 @@ class GaugeCollector(object):
 
     def collect(self):
         for jail in self.get_jails(self.extract_data()):
+            jail = jail.strip()
             g = GaugeMetricFamily("fail2ban_{}".format(
                 self.snake_case(jail)), "", labels=['type'])
             for label, value in self.extract_data(jail):
