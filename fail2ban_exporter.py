@@ -9,10 +9,10 @@ from prometheus_client import Gauge, start_http_server
 from prometheus_client.core import REGISTRY, GaugeMetricFamily
 
 
-addr = os.getenv('LISTEN_ADDRESS', 'localhost')
-port = int(os.getenv('LISTEN_PORT', 9180))
-cmd =  os.path.join(os.getenv('EXEC_PATH', '/usr/bin/'), 'fail2ban-client')
-comp = compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
+ADDR = os.getenv('LISTEN_ADDRESS', 'localhost')
+PORT = int(os.getenv('LISTEN_PORT', 9180))
+CMD = os.path.join(os.getenv('EXEC_PATH', '/usr/bin/'), 'fail2ban-client')
+COMP = compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
 
 
 class GaugeCollector(object):
@@ -31,18 +31,18 @@ class GaugeCollector(object):
         return jails[1][1].split(",")
 
     def extract_data(self, jail=None):
-        args = [cmd, "status"]
+        args = [CMD, "status"]
         if jail:
             args.append(jail)
         r = run(args, stdout=PIPE, check=True)
-        return findall(comp, r.stdout.decode('utf-8'))
+        return findall(COMP, r.stdout.decode('utf-8'))
 
     def snake_case(self, string):
         return string.strip().replace("-", "_").replace(" ", "_").lower()
 
 
 # Code execution starts from here
-start_http_server(port, addr)
+start_http_server(PORT, ADDR)
 REGISTRY.register(GaugeCollector())
 while True:
     sleep(10)
