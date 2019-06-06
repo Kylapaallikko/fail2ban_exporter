@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import os
 import re
 
@@ -16,14 +17,15 @@ COMP = re.compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
 
 
 class GaugeCollector(object):
+    def __init__(self, ignored_jails):
+        self.ignored_jails = ignored_jails
 
     def collect(self):
         for jail in self.get_jails():
             g = GaugeMetricFamily("fail2ban_{}".format(
                 self.snake_case(jail)), "", labels=['type'])
             for label, value in self.extract_data(jail):
-                g.add_metric(
-                    [self.snake_case(label)], float(value))
+                g.add_metric([self.snake_case(label)], float(value))
             yield g
 
     def get_jails(self):
@@ -31,7 +33,7 @@ class GaugeCollector(object):
         m = re.search(r'Jail list:\s*([a-z\-, ]*)\n', r.stdout.decode('utf-8'))
         if not m:
             return []
-        return m.group(1).split(", ")
+        return [jail for jail in m.group(1).split(", ") if jail not in self.ignored_jails]
 
     def extract_data(self, jail):
         args = [CMD, "status"]
@@ -44,8 +46,16 @@ class GaugeCollector(object):
         return string.strip().replace("-", "_").replace(" ", "_").lower()
 
 
-# Code execution starts from here
-start_http_server(PORT, ADDR)
-REGISTRY.register(GaugeCollector())
-while True:
-    sleep(10)
+if __name__ == "__main__":
+    # Parse arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-ij", "--ignore-jail", action="append",
+                        dest="ignored_jails", default=[],
+                        help="Ignore a jail. This argument can appear many times.")
+    args = parser.parse_args()
+
+    # Run HTTP server
+    start_http_server(PORT, ADDR)
+    REGISTRY.register(GaugeCollector(args.ignored_jails))
+    while True:
+        sleep(10)
