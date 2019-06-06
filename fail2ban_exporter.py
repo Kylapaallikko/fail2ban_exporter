@@ -38,7 +38,7 @@ class GaugeCollector(object):
         return findall(comp, r.stdout.decode('utf-8'))
 
     def snake_case(self, string):
-        return string.strip().replace("-", "_").replace(" ", "_")
+        return string.strip().replace("-", "_").replace(" ", "_").lower()
 
 
 # Code execution starts from here
