@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
+import re
 
-from re import compile, findall
 from subprocess import PIPE, run
 from time import sleep
 
@@ -12,14 +12,13 @@ from prometheus_client.core import REGISTRY, GaugeMetricFamily
 ADDR = os.getenv('LISTEN_ADDRESS', 'localhost')
 PORT = int(os.getenv('LISTEN_PORT', 9180))
 CMD = os.path.join(os.getenv('EXEC_PATH', '/usr/bin/'), 'fail2ban-client')
-COMP = compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
+COMP = re.compile(r'\s([a-zA-Z\s]+):\t([a-zA-Z0-9-,\s]+)\n')
 
 
 class GaugeCollector(object):
 
     def collect(self):
-        for jail in self.get_jails(self.extract_data()):
-            jail = jail.strip()
+        for jail in self.get_jails():
             g = GaugeMetricFamily("fail2ban_{}".format(
                 self.snake_case(jail)), "", labels=['type'])
             for label, value in self.extract_data(jail):
@@ -27,15 +26,19 @@ class GaugeCollector(object):
                     [self.snake_case(label)], float(value))
             yield g
 
-    def get_jails(self, jails):
-        return jails[1][1].split(",")
+    def get_jails(self):
+        r = run([CMD, "status"], stdout=PIPE, check=True)
+        m = re.search(r'Jail list:\s*([a-z\-, ]*)\n', r.stdout.decode('utf-8'))
+        if not m:
+            return []
+        return m.group(1).split(", ")
 
-    def extract_data(self, jail=None):
+    def extract_data(self, jail):
         args = [CMD, "status"]
         if jail:
             args.append(jail)
         r = run(args, stdout=PIPE, check=True)
-        return findall(COMP, r.stdout.decode('utf-8'))
+        return re.findall(COMP, r.stdout.decode('utf-8'))
 
     def snake_case(self, string):
         return string.strip().replace("-", "_").replace(" ", "_").lower()
