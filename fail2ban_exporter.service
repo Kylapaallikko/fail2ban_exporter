@@ -1,7 +1,7 @@
 [Unit]
 Description=fail2ban Prometheus exporter
-Wants=network-online.target
-After=network-online.target
+Wants=network-online.target fail2ban.service
+After=network-online.target fail2ban.service
 
 [Service]
 Type=simple
